@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+        <com.clc.srv.PageRecyclerView
+            android:id="@+id/prv_list"
+            android:layout_width="1000px"
+            android:layout_height="300px"
+            android:background="#D9D9D4" />
+
+    </LinearLayout>
+</layout>
