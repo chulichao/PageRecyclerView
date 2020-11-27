@@ -22,6 +22,7 @@ public class PageRecyclerView extends RecyclerView {
     private long mDownTime;
     private int mScrollX;
     private PageChangedListener mPageChangedListener;
+    private int mOldX;
 
     public int gainScrollX() {
         return mScrollX;
@@ -64,27 +65,13 @@ public class PageRecyclerView extends RecyclerView {
             int currX = gainScrollX();
             int finalX = findFinalX(currX);
             Log.d(TAG, "currX = " + currX + ", finalX = " + finalX);
-/*            mScroller.startScroll(currX, 0, finalX - currX, 0);
-            invalidate();*/
-            smoothScrollTo(finalX);
+            mScroller.startScroll(currX, 0, finalX - currX, 0);
+            invalidate();
             if (mPageChangedListener != null) {
                 mPageChangedListener.onPageChanged(finalX / PAGE_WIDTH + 1);
             }
         }
         return super.onTouchEvent(event);
-    }
-
-    private void smoothScrollTo(int finalX) {
-        if (gainScrollX() < finalX) {
-            scrollBy(1, 0);
-        } else if (gainScrollX() > finalX) {
-            scrollBy(-1, 0);
-        } else {
-            //递归出口
-            return;
-        }
-        invalidate();
-        smoothScrollTo(finalX);
     }
 
     /**
@@ -115,15 +102,24 @@ public class PageRecyclerView extends RecyclerView {
         }
     }
 
-/*    @Override
+    @Override
     public void computeScroll() {
         Log.d(TAG, "computeScroll: ");
+        mOldX = gainScrollX();
         if (mScroller.computeScrollOffset()) {
             Log.d(TAG, "mScroller.getCurrX() = " + mScroller.getCurrX());
-            scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
+            scrollTo(mScroller.getCurrX(), 0);
             invalidate();
         }
-    }*/
+    }
+
+    /**
+     * RecyclerView自己的scrollTo()是空方法
+     */
+    @Override
+    public void scrollTo(int x, int y) {
+        scrollBy(x - mOldX, 0);
+    }
 
     public interface PageChangedListener {
         void onPageChanged(int pageNum);
