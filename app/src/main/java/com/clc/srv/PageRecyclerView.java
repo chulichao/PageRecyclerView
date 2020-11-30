@@ -76,6 +76,18 @@ public class PageRecyclerView extends RecyclerView {
     }
 
     /**
+     * 获取scroll终点（如果滑动临界是页宽的一半）
+     */
+    /*private int findFinalX(int currX) {
+        int multiple = currX / DISTANCE_LIMIT;
+        if ((multiple & 1) == 1) {
+            return DISTANCE_LIMIT * (multiple + 1);
+        } else {
+            return DISTANCE_LIMIT * multiple;
+        }
+    }*/
+
+    /**
      * 获取scroll终点（较为通用）
      */
     private int findFinalX(int currX) {
