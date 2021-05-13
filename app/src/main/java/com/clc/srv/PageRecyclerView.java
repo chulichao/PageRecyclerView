@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.widget.ScrollView;
 import android.widget.Scroller;
 
 import androidx.annotation.NonNull;
@@ -14,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class PageRecyclerView extends RecyclerView {
     private static final String TAG = "PageRecyclerView";
     public static final int PAGE_WIDTH = 1000;
-    public static final int DISTANCE_LIMIT = 300;
+    public static final int DISTANCE_LIMIT = 200;
     public static final float SCROLL_CRITICAL_SPEED = 1000f;
     private static final int TO_SECOND = 1000;
     private Scroller mScroller;
@@ -61,6 +60,9 @@ public class PageRecyclerView extends RecyclerView {
                 break;
             case MotionEvent.ACTION_UP:
                 int currX = gainScrollX();
+                if (currX == mDownX) {
+                    return super.onTouchEvent(event);
+                }
                 int finalX = findFinalX(currX);
                 Log.d(TAG, "currX = " + currX + ", finalX = " + finalX);
                 mScroller.startScroll(currX, 0, finalX - currX, 0);
@@ -95,23 +97,38 @@ public class PageRecyclerView extends RecyclerView {
         int multiple = currX / PAGE_WIDTH;
         float speed = (currX - mDownX) * TO_SECOND / (System.currentTimeMillis() - mDownTime);
         Log.d(TAG, "scroll speed = " + speed);
-        if (speed < SCROLL_CRITICAL_SPEED && speed > -SCROLL_CRITICAL_SPEED) {
-            //滑动速度慢，才会判断距离
-            if (remainder < DISTANCE_LIMIT) {
-                return PAGE_WIDTH * multiple;
-            }
-            if (remainder > PAGE_WIDTH - DISTANCE_LIMIT) {
-                return PAGE_WIDTH * (multiple + 1);
-            }
-        }
-
-        /**
-         * 滑动速度快，直接走以下步骤
-         */
         if (currX > mDownX) {
-            return PAGE_WIDTH * (multiple + 1);
+            //往正方向滑
+            if (speed > SCROLL_CRITICAL_SPEED) {
+                //滑动速度快，直接翻页
+                Log.d(TAG, "findFinalX: 1");
+                return PAGE_WIDTH * (multiple + 1);
+            } else {
+                //滑动速度慢，则判断距离够不够
+                if (remainder < DISTANCE_LIMIT) {
+                    //距离不够，不翻页
+                    return PAGE_WIDTH * multiple;
+                } else {
+                    //距离够，翻页
+                    return PAGE_WIDTH * (multiple + 1);
+                }
+            }
         } else {
-            return PAGE_WIDTH * (multiple);
+            //往负方向滑
+            if (speed < -SCROLL_CRITICAL_SPEED) {
+                //滑动速度快，直接翻页
+                Log.d(TAG, "findFinalX: 4");
+                return PAGE_WIDTH * (multiple);
+            } else {
+                //滑动速度慢，则判断距离够不够
+                if (PAGE_WIDTH - remainder < DISTANCE_LIMIT) {
+                    //距离不够，不翻页
+                    return PAGE_WIDTH * (multiple + 1);
+                } else {
+                    //距离够，翻页
+                    return PAGE_WIDTH * (multiple);
+                }
+            }
         }
     }
 
