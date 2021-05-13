@@ -52,7 +52,7 @@ public class PageRecyclerView extends RecyclerView {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean dispatchTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mDownX = gainScrollX();
@@ -61,7 +61,7 @@ public class PageRecyclerView extends RecyclerView {
             case MotionEvent.ACTION_UP:
                 int currX = gainScrollX();
                 if (currX == mDownX) {
-                    return super.onTouchEvent(event);
+                    return super.dispatchTouchEvent(event);
                 }
                 int finalX = findFinalX(currX);
                 Log.d(TAG, "currX = " + currX + ", finalX = " + finalX);
@@ -74,7 +74,7 @@ public class PageRecyclerView extends RecyclerView {
             default:
                 // Do nothing.
         }
-        return super.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 
     /**
